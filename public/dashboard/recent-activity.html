@@ -350,13 +350,18 @@ function displayRecentActivities(activities) {
         const statusIcon = getStatusIcon(activity.status);
         const statusClass = activity.status;
         
+        // Ensure we display the actual meeting name, not just "Meeting"
+        const displayName = activity.meetingName && activity.meetingName !== 'Unnamed Meeting' 
+            ? activity.meetingName 
+            : `Meeting ${activity.meetingId?.substring(0, 8) || ''}`;
+        
         return `
             <div class="activity-item">
                 <div class="activity-avatar">
                     <img src="${activity.userId?.profilePicture || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'}" alt="User">
                 </div>
                 <div class="activity-content">
-                    <div class="activity-title">${activity.meetingName}</div>
+                    <div class="activity-title">${displayName}</div>
                     <div class="activity-time">${timeAgo}</div>
                     ${activity.duration ? `<div class="activity-duration">${activity.duration} minutes</div>` : ''}
                 </div>

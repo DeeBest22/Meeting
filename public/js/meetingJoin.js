@@ -1689,6 +1689,31 @@ class WebRTCManager {
 
         leaveMeeting() {
           if (confirm('Are you sure you want to leave the meeting?')) {
+            // Get meeting details before leaving
+            const meetingName = document.getElementById('meetingTitle')?.textContent || 
+                               document.querySelector('.meeting-title')?.textContent || 
+                               document.querySelector('h1')?.textContent || 
+                               'Meeting';
+            
+            const joinTime = meetingJoinTime || new Date();
+            const leaveTime = new Date();
+            const duration = Math.round((leaveTime - joinTime) / (1000 * 60)); // Duration in minutes
+            
+            // Get current user info
+            const userId = currentUser?.id;
+            
+            // Emit user left event for activity tracking
+            if (socket && userId) {
+                socket.emit('user-left-meeting', {
+                    meetingId: meetingId,
+                    meetingName: meetingName,
+                    userId: userId,
+                    duration: duration,
+                    joinTime: joinTime,
+                    leaveTime: leaveTime
+                });
+            }
+            
             this.webrtc.leaveMeeting();
             this.socket.disconnect();
             window.location.href = '/dashboard';

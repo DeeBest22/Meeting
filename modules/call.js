@@ -1720,6 +1720,44 @@ export const setupSocketIO = (server) => {
       console.log(`Host ${socket.id} ${muteAll ? 'muted' : 'unmuted'} all participants in meeting ${participantInfo.meetingId}`);
     });
 
+    // Handle meeting completion for activity tracking
+    socket.on('meeting-completed', async (data) => {
+      try {
+        const { meetingId, meetingName, userId, duration, participants, startTime, endTime } = data;
+        
+        console.log('Meeting completed:', { meetingId, meetingName, userId, duration });
+        
+        // Emit to meeting activity module
+        socket.emit('meeting-completed', {
+          meetingId,
+          meetingName,
+          userId,
+          duration,
+          participants,
+          startTime,
+          endTime
+        });
+        
+      } catch (error) {
+        console.error('Error handling meeting completion:', error);
+      }
+    });
+    
+    // Handle user leaving meeting for activity tracking
+    socket.on('user-left-meeting', async (data) => {
+      try {
+        const { meetingId, meetingName, userId, duration, joinTime, leaveTime } = data;
+        
+        console.log('User left meeting:', { meetingId, meetingName, userId, duration });
+        
+        // You can emit this to activity module if you want to track individual user sessions
+        // For now, we'll just log it
+        
+      } catch (error) {
+        console.error('Error handling user left meeting:', error);
+      }
+    });
+
     socket.on('disconnect', (reason) => {
       const participantInfo = participants.get(socket.id);
       

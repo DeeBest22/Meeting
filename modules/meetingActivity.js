@@ -201,6 +201,8 @@ export const setupMeetingActivity = (app, io) => {
           console.error('Missing required data for meeting-completed event');
           return;
         }
+        
+        console.log('Processing meeting completion:', { meetingId, meetingName, userId, duration });
 
         // Try to find existing activity first
         let activity = await MeetingActivity.findOne({ 
@@ -217,7 +219,7 @@ export const setupMeetingActivity = (app, io) => {
             duration,
             participants,
             endTime: endTime || new Date(),
-            meetingName: meetingName || activity.meetingName // Preserve or update meeting name
+            meetingName: meetingName && meetingName !== 'Meeting Room' ? meetingName : activity.meetingName
           });
         } else {
           // Create new completed activity
@@ -229,6 +231,8 @@ export const setupMeetingActivity = (app, io) => {
             endTime: endTime || new Date()
           });
         }
+        
+        console.log('Activity saved:', activity);
 
         // Emit to user's room
         socket.to(`user-${userId}`).emit('activity-updated', {
